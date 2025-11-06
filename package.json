@@ -1,0 +1,28 @@
+{
+  "name": "synckarma-worker",
+  "version": "1.0.0",
+  "description": "TypeScript worker process for Azure Container Apps",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "typescript",
+    "worker",
+    "azure"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "salesforce-pubsub-api-client": "^5.5.0"    
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
+
