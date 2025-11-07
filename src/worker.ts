@@ -2,18 +2,24 @@
  * Worker class that handles the main processing logic
  */
 
-// import PubSubApiClient from 'salesforce-pubsub-api-client';
+import PubSubApiClient from 'salesforce-pubsub-api-client';
+import { EventHandler } from './event-handler';
 
-// const pubSubApiClient = new PubSubApiClient({
-//   authType: 'user-supplied',
-//   accessToken: process.env.SF_ACCESS_TOKEN,
-//   instanceUrl: process.env.SF_INSTANCE_URL,
-//   organizationId: process.env.SF_ORG_ID
-// });
+const pubSubApiClient = new PubSubApiClient({
+  authType: 'user-supplied',
+  accessToken: process.env.SF_ACCESS_TOKEN,
+  instanceUrl: process.env.SF_INSTANCE_URL,
+  organizationId: process.env.SF_ORG_ID
+});
 
 export class Worker {
   private isRunning: boolean = false;
   private intervalId?: NodeJS.Timeout;
+  private eventHandler: EventHandler;
+
+  constructor() {
+    this.eventHandler = new EventHandler(() => this.stop());
+  }
 
   /**
    * Start the worker process
@@ -26,6 +32,12 @@ export class Worker {
 
     this.isRunning = true;
     console.log('Worker started');
+    await pubSubApiClient.connect();
+    console.log('✅ Connected to Salesforce PubSub');
+    
+    console.log('Attempting to subscribe to PubSub...');
+    pubSubApiClient.subscribe('/data/OrderChangeEvent', this.eventHandler.handleEvents.bind(this.eventHandler), 3);
+    console.log('✅ Subscribed to PubSub');
 
     // Example: Run a task every 5 seconds
     // Adjust this interval based on your needs
@@ -42,6 +54,7 @@ export class Worker {
    */
   async stop(): Promise<void> {
     if (!this.isRunning) {
+      process.exit(0);
       return;
     }
 
@@ -56,6 +69,7 @@ export class Worker {
     // Wait for any in-flight tasks to complete
     await this.waitForCompletion();
     console.log('Worker stopped');
+    process.exit(0);
   }
 
   /**
@@ -65,7 +79,7 @@ export class Worker {
   private async processTask(): Promise<void> {
     try {
       const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] Processing task...`);
+      console.log(`[${timestamp}] Checking that pubsub is connected...`);
 
       // TODO: Add your task processing logic here
       // Example: Fetch from queue, process data, send notifications, etc.
@@ -110,4 +124,3 @@ export class Worker {
     return this.isRunning;
   }
 }
-

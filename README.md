@@ -17,8 +17,6 @@ export ARM_CLIENT_SECRET="<password>"
 export ARM_SUBSCRIPTION_ID="<subscriptionid>"
 export ARM_TENANT_ID="<tenantid>"
 
-export $(grep -v '^#' .env | xargs)
-
 terraform init -upgrade
 terraform fmt
 terraform validate
@@ -26,11 +24,32 @@ terraform plan -out main.tfplan
 terraform apply main.tfplan
 terraform destroy
 
-to redeploy
-terraform apply -var="run_id=$(date +%s)"
+== next steps ==
+- connect to SFDC (require env vars)
+- recognize a transaction that needs to go to NetSuite
+- log the transaction to console
 
 
-problems - at runtime the Container Apps pulls from synckarmareg.azurecr.io ... it must authenticate separately
-== NEED UAMI ==
-see: https://stackoverflow.com/questions/79608759/how-do-i-deploy-an-azure-container-app-from-scratch-using-terraform-azurerm
+SCRATCH_INFO=$(sf org display --target-org scratch-01 --json)
+echo "SF_ACCESS_TOKEN=$(echo $SCRATCH_INFO | jq -r '.result.accessToken')" > env.scratch
+echo "SF_INSTANCE_URL=$(echo $SCRATCH_INFO | jq -r '.result.instanceUrl')" >> env.scratch
+echo "SF_ORG_ID=$(echo $SCRATCH_INFO | jq -r '.result.id')" >> env.scratch 
+
+
+set -a
+source env.middleware
+set +a
+--- or ---
+export $(grep -v '^#' .env.middleware | xargs)
+
+local docker
+-------------
+docker build -t synckarma-worker:latest .  
+docker run --env-file .env.middleware synckarma-worker:latest
+
+SF Login
+--------
+sf org open --target-org scratch-01
+
+
 
