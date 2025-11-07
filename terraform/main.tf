@@ -36,8 +36,7 @@ resource "azurerm_container_registry" "app_registry" {
   sku                 = "Standard"
 }
 
-
-resource "null_resource" "push_image" {
+resource "null_resource" "push_image_to_registry" {
   triggers = {
     run_id = var.run_id
   }
@@ -77,6 +76,10 @@ resource "azurerm_container_app" "app" {
   resource_group_name          = azurerm_resource_group.resource_group.name
   revision_mode                = "Multiple"
 
+  lifecycle {
+    replace_triggered_by = [null_resource.push_image_to_registry]
+  }
+
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.identity.id]
@@ -93,11 +96,23 @@ resource "azurerm_container_app" "app" {
       image  = "${azurerm_container_registry.app_registry.login_server}/${var.container_image_name}:${var.container_image_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
+      env {
+        name  = "SF_ACCESS_TOKEN"
+        value = var.sf_access_token
+      }
+      env {
+        name  = "SF_INSTANCE_URL"
+        value = var.sf_instance_url
+      }
+      env {
+        name  = "SF_ORG_ID"
+        value = var.sf_org_id
+      }
     }
   }
 
   depends_on = [
-    null_resource.push_image,
+    null_resource.push_image_to_registry,
     azurerm_role_assignment.acr_pull
   ]
 

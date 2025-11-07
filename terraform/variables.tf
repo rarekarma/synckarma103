@@ -1,3 +1,6 @@
+# run_id is used to rebuild and push the docker image: see resource "null_resource" "push_image" in main.tf
+# to redeploy, do: terraform apply -var="run_id=$(date +%s)"
+# see: https://stackoverflow.com/questions/79608759/how-do-i-deploy-an-azure-container-app-from-scratch-using-terraform-azurerm
 variable "run_id" {
   description = "Id used to rebuild and push the docker image"
   type        = string
@@ -63,4 +66,25 @@ variable "azurerm_container_app_name" {
   description = "The name for the Azure Container App."
   type        = string
   default     = "synckarma-app"
+}
+
+variable "sf_access_token" {
+  description = "The access token for the Salesforce organization."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "sf_instance_url" {
+  description = "The instance URL for the Salesforce organization."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "sf_org_id" {
+  description = "The organization ID for the Salesforce organization."
+  type        = string
+  default     = ""
+  sensitive   = true
 }
