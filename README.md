@@ -47,9 +47,10 @@ local docker
 docker build -t synckarma-worker:latest .  
 docker run --env-file .env.middleware synckarma-worker:latest
 
-SF Login
---------
+SF Commands
+-----------
 sf org open --target-org scratch-01
+sf package installed list --target-org scratch-01
 
 
 
