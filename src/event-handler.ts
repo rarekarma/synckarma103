@@ -1,5 +1,6 @@
 import { AccountChangeEvent, Account } from './account';
 import { NetSuite } from './netsuite';
+import { NetSuiteCustomerMatch } from './netsuite-customer-match';
 
 /**
  * EventHandler class that handles PubSub subscription events
@@ -113,6 +114,11 @@ export class EventHandler {
   }
 
   private async processAccountChangeEvent(accountChangeEvent: AccountChangeEvent): Promise<void> {
+    const accountId = accountChangeEvent.payload.ChangeEventHeader?.recordIds[0];
+    if (!accountId) { // this should never happen because we're only processing account change events
+      console.error('Account ID is missing from ChangeEventHeader');
+      return;
+    }
     const changedFields: string[] = accountChangeEvent.payload.ChangeEventHeader?.changedFields ?? [];
     console.log('Account Change Event.  Changed fields:', changedFields);
     const netSuiteCustomerId = accountChangeEvent.payload.synckarma103__NetSuite_Customer_ID__c;
@@ -123,12 +129,7 @@ export class EventHandler {
     ) {
       console.log('Getting matches from NetSuite...');
       let account: Account;
-      const accountId = accountChangeEvent.payload.ChangeEventHeader?.recordIds[0];
       if (accountChangeEvent.payload.ChangeEventHeader?.changeType === 'UPDATE') {
-        if (!accountId) {
-          console.error('Account ID is missing from ChangeEventHeader');
-          return;
-        }
         console.log(`DEBUG: Account payload is an update, getting all account data for ${accountId}`);
         account = await Account.getAccount(accountId);
       } else {
@@ -136,12 +137,16 @@ export class EventHandler {
         // For CREATE events, construct Account from the payload (excluding ChangeEventHeader)
         account = new Account(accountChangeEvent.payload);
       }
-      // TODO: this is still passing in an Account without name, postalCode or phone.  Are we getting this data from Salesforce?
+      
       console.log('Account Name:', account.Name);
       console.log('Account Postal Code:', account.BillingAddress?.PostalCode);
       console.log('Account Phone:', account.Phone);
       const likelyMatchesJSON = await this.netSuite.getCustomerLikelyMatches(account, accountId);
       console.log('Likely NetSuite customer matches:', likelyMatchesJSON);
+      const namespace = process.env.SF_NAMESPACE ?? '';
+      const netSuiteCustomerMatch = new NetSuiteCustomerMatch(accountId, likelyMatchesJSON, namespace);
+      const netSuiteCustomerMatchId = await netSuiteCustomerMatch.createInSalesforce();
+      console.log('NetSuite Customer Match ID:', netSuiteCustomerMatchId);
     }
   }
 }
