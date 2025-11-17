@@ -7,6 +7,8 @@ import { EventHandler } from './event-handler';
 
 const pubSubApiClient = new PubSubApiClient({
   authType: 'user-supplied',
+  // environment variables are set in the container app by terraform
+  // see .env.terraform for the values
   accessToken: process.env.SF_ACCESS_TOKEN,
   instanceUrl: process.env.SF_INSTANCE_URL,
   organizationId: process.env.SF_ORG_ID
@@ -36,7 +38,16 @@ export class Worker {
     console.log('✅ Connected to Salesforce PubSub');
     
     console.log('Attempting to subscribe to PubSub...');
-    pubSubApiClient.subscribe('/data/OrderChangeEvent', this.eventHandler.handleEvents.bind(this.eventHandler), 3);
+    pubSubApiClient.subscribe(
+      '/data/OrderChangeEvent',
+      this.eventHandler.handleCallback.bind(this.eventHandler),
+      3
+    );
+    pubSubApiClient.subscribe(
+      '/data/AccountChangeEvent',
+      this.eventHandler.handleCallback.bind(this.eventHandler),
+      3
+    );
     console.log('✅ Subscribed to PubSub');
 
     // Example: Run a task every 5 seconds

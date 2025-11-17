@@ -21,7 +21,7 @@ terraform init -upgrade
 terraform fmt
 terraform validate
 terraform plan -out main.tfplan
-terraform apply main.tfplan
+terraform apply main.tfplan ## run with the environment variables set (.env.terraform)
 terraform destroy
 
 == next steps ==

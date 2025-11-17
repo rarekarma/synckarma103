@@ -1,0 +1,63 @@
+{
+    "id": "61335d8a-b211-4578-b0ab-ad4a73f66fb0",
+    "schemaId": "_ZODZ6semvP2XAR6W5_D1Q",
+    "replayId": 7913870,
+    "payload": {
+      "ChangeEventHeader": {
+        "entityName": "Account",
+        "recordIds": [
+          "001Em000011YZFFIA4"
+        ],
+        "changeType": "UPDATE",
+        "changeOrigin": "com/salesforce/api/soap/65.0;client=SfdcInternalAPI/",
+        "transactionKey": "00005780-cdfc-2739-e06f-3c3ac8b68cda",
+        "sequenceNumber": 1,
+        "commitTimestamp": 1763334886000,
+        "commitNumber": "1763334886070943748",
+        "commitUser": "005Em00000UT40XIAT",
+        "nulledFields": [],
+        "diffFields": [],
+        "changedFields": [
+          "LastModifiedDate",
+          "synckarma103__Requires_NetSuite_Customer_Mapping__c"
+        ]
+      },
+      "Name": null,
+      "Type": null,
+      "ParentId": null,
+      "BillingAddress": null,
+      "ShippingAddress": null,
+      "Phone": null,
+      "Fax": null,
+      "AccountNumber": null,
+      "Website": null,
+      "Sic": null,
+      "Industry": null,
+      "AnnualRevenue": null,
+      "NumberOfEmployees": null,
+      "Ownership": null,
+      "TickerSymbol": null,
+      "Description": null,
+      "Rating": null,
+      "Site": null,
+      "OwnerId": null,
+      "CreatedDate": null,
+      "CreatedById": null,
+      "LastModifiedDate": 1763334886000,
+      "LastModifiedById": null,
+      "Jigsaw": null,
+      "JigsawCompanyId": null,
+      "CleanStatus": null,
+      "AccountSource": null,
+      "DunsNumber": null,
+      "Tradestyle": null,
+      "NaicsCode": null,
+      "NaicsDesc": null,
+      "YearStarted": null,
+      "SicDesc": null,
+      "DandbCompanyId": null,
+      "OperatingHoursId": null,
+      "synckarma103__NetSuite_Customer_ID__c": null,
+      "synckarma103__Requires_NetSuite_Customer_Mapping__c": true
+    }
+  }
