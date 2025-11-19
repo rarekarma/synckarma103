@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Selected_NetSuite_Internal_ID__c</fullName>
+    <description>The internalid of a NetSuite Customer chosen by a human to match;  or returned after a new NetSuite Customer was created.</description>
+    <externalId>false</externalId>
+    <label>Selected NetSuite Internal ID</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
