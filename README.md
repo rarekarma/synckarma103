@@ -47,10 +47,19 @@ local docker
 docker build -t synckarma-worker:latest .  
 docker run --env-file .env.middleware synckarma-worker:latest
 
+docker development
+------------------
+docker build --build-arg BUILD_DEV_DEPS=true -t synckarma-worker:dev .
+docker run --env-file .env.middleware synckarma-worker:dev
+
 SF Commands
 -----------
 sf org open --target-org scratch-01
 sf package installed list --target-org scratch-01
 
-
+To Fix
+------
+- When LWC 
+- LWC spins even when no data
+- Order is created on Account, get an AccountChangeEvent with no changedFields?
 

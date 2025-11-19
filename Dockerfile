@@ -24,8 +24,13 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies (use --only=production unless BUILD_DEV_DEPS is set)
+ARG BUILD_DEV_DEPS=false
+RUN if [ "$BUILD_DEV_DEPS" = "true" ]; then \
+      npm ci && npm cache clean --force; \
+    else \
+      npm ci --only=production && npm cache clean --force; \
+    fi
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist

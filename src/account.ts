@@ -458,4 +458,42 @@ export class Account {
       synckarma103__Requires_NetSuite_Customer_Mapping__c: accountData.synckarma103__Requires_NetSuite_Customer_Mapping__c ?? null
     });
   }
+
+  /**
+   * Updates the synckarma103__Requires_NetSuite_Customer_Mapping__c field on an Account
+   * @param accountId - Salesforce Account record ID
+   * @param value - Value to set (true/false)
+   */
+  static async updateRequiresNetSuiteCustomerMapping(accountId: string, value: boolean): Promise<void> {
+    if (!accountId) {
+      throw new Error('Account ID is required to update account');
+    }
+
+    const instanceUrl = process.env.SF_INSTANCE_URL;
+    const accessToken = process.env.SF_ACCESS_TOKEN;
+
+    if (!instanceUrl || !accessToken) {
+      throw new Error('SF_INSTANCE_URL and SF_ACCESS_TOKEN environment variables are required');
+    }
+
+    // Build the Salesforce REST API URL
+    const apiUrl = `${instanceUrl}/services/data/v58.0/sobjects/Account/${accountId}`;
+
+    // Update account field in Salesforce
+    const response = await fetch(apiUrl, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        synckarma103__Requires_NetSuite_Customer_Mapping__c: value
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to update account in Salesforce: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+  }
 }

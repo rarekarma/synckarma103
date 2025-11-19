@@ -1,4 +1,5 @@
 import { Account } from './account';
+import { logger } from './logger';
 
 /**
  * NetSuite integration utilities
@@ -22,7 +23,12 @@ export class NetSuite {
     const accountName = account.Name ?? '';
     const billingZip = account.BillingAddress?.PostalCode ?? '';
     const phone = account.Phone ?? '';
-    console.log('DEBUG: Getting NetSuite customer likely matches for account:', accountId, accountName, billingZip, phone);
+    logger.debug({ 
+      accountId, 
+      accountName, 
+      billingZip, 
+      phone 
+    }, 'Getting NetSuite customer likely matches for account');
 
     const matchesJSON = await this.netSuiteAPI.getCustomerLikelyMatches(
       accountId ?? '',
@@ -31,7 +37,7 @@ export class NetSuite {
       phone
     );
 
-    console.log('DEBUG: Matches JSON:', matchesJSON);
+    logger.debug({ matchesJSON }, 'Matches JSON');
 
     return matchesJSON;
   }

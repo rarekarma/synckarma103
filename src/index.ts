@@ -4,12 +4,13 @@
  */
 
 import { Worker } from './worker';
+import { logger } from './logger';
 
 // Graceful shutdown handler
 let shutdown = false;
 
 const gracefulShutdown = (signal: string) => {
-  console.log(`Received ${signal}, initiating graceful shutdown...`);
+  logger.info({ signal }, 'Received signal, initiating graceful shutdown');
   shutdown = true;
 };
 
@@ -18,39 +19,41 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Unhandled error handlers
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error({ reason, promise }, 'Unhandled Rejection');
   process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  logger.error({ error }, 'Uncaught Exception');
   process.exit(1);
 });
 
 // Main execution
 async function main() {
-  console.log('Starting worker process...');
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Process ID: ${process.pid}`);
+  logger.info('Starting worker process');
+  logger.info({ 
+    environment: process.env.NODE_ENV || 'development',
+    pid: process.pid 
+  }, 'Worker process info');
 
   const worker = new Worker();
 
   try {
     await worker.start();
-    console.log('Worker started successfully');
+    logger.info('Worker started successfully');
 
     // Keep the process alive
     const keepAlive = setInterval(() => {
       if (shutdown) {
         clearInterval(keepAlive);
         worker.stop().then(() => {
-          console.log('Worker stopped gracefully');
+          logger.info('Worker stopped gracefully');
           process.exit(0);
         });
       }
     }, 1000);
   } catch (error) {
-    console.error('Failed to start worker:', error);
+    logger.error({ error }, 'Failed to start worker');
     process.exit(1);
   }
 }

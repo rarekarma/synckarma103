@@ -4,6 +4,7 @@
 
 import PubSubApiClient from 'salesforce-pubsub-api-client';
 import { EventHandler } from './event-handler';
+import { logger } from './logger';
 
 const pubSubApiClient = new PubSubApiClient({
   authType: 'user-supplied',
@@ -12,7 +13,7 @@ const pubSubApiClient = new PubSubApiClient({
   accessToken: process.env.SF_ACCESS_TOKEN,
   instanceUrl: process.env.SF_INSTANCE_URL,
   organizationId: process.env.SF_ORG_ID
-});
+}, logger);
 
 export class Worker {
   private isRunning: boolean = false;
@@ -28,33 +29,33 @@ export class Worker {
    */
   async start(): Promise<void> {
     if (this.isRunning) {
-      console.warn('Worker is already running');
+      logger.warn('Worker is already running');
       return;
     }
 
     this.isRunning = true;
-    console.log('Worker started');
+    logger.info('Worker started');
     await pubSubApiClient.connect();
-    console.log('✅ Connected to Salesforce PubSub');
+    logger.info('Connected to Salesforce PubSub');
     
-    console.log('Attempting to subscribe to PubSub...');
     pubSubApiClient.subscribe(
       '/data/OrderChangeEvent',
       this.eventHandler.handleCallback.bind(this.eventHandler),
-      3
+      100
     );
+    logger.info('Subscribed to OrderChangeEvent');
     pubSubApiClient.subscribe(
       '/data/AccountChangeEvent',
       this.eventHandler.handleCallback.bind(this.eventHandler),
-      3
+      100
     );
-    console.log('✅ Subscribed to PubSub');
+    logger.info('Subscribed to AccountChangeEvent');
 
-    // Example: Run a task every 5 seconds
+    // Example: Run a task every 60 seconds
     // Adjust this interval based on your needs
     this.intervalId = setInterval(async () => {
       await this.processTask();
-    }, 5000);
+    }, 60000);
 
     // Process initial task immediately
     await this.processTask();
@@ -69,7 +70,7 @@ export class Worker {
       return;
     }
 
-    console.log('Stopping worker...');
+    logger.info('Stopping worker...');
     this.isRunning = false;
 
     if (this.intervalId) {
@@ -79,7 +80,7 @@ export class Worker {
 
     // Wait for any in-flight tasks to complete
     await this.waitForCompletion();
-    console.log('Worker stopped');
+    logger.info('Worker stopped');
     process.exit(0);
   }
 
@@ -89,31 +90,24 @@ export class Worker {
    */
   private async processTask(): Promise<void> {
     try {
-      const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] Checking that pubsub is connected...`);
-
-      // TODO: Add your task processing logic here
-      // Example: Fetch from queue, process data, send notifications, etc.
-
-      await this.simulateWork();
-
-      console.log(`[${timestamp}] Task completed successfully`);
+      logger.debug('Checking that pubsub is connected...');
+      await this.checkPubSubConnection();
+      logger.debug('Task completed successfully');
     } catch (error) {
-      console.error('Error processing task:', error);
+      logger.error({ error }, 'Error processing task');
       // Decide whether to continue or stop on error
     }
   }
 
-  /**
-   * Simulate work (replace with actual logic)
-   */
-  private async simulateWork(): Promise<void> {
+  private async checkPubSubConnection(): Promise<void> {
     // Simulate async work
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 100);
-    });
+    const state = await pubSubApiClient.getConnectivityState();
+    logger.debug({ state }, 'Connectivity state');
+    // if (connection) {
+    //   logger.info('PubSub connection is healthy');
+    // } else {
+    //   logger.error('PubSub connection is not healthy');
+    // }
   }
 
   /**
