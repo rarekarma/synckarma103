@@ -1,0 +1,46 @@
+{
+    "accountId": "001Em000011YZFFIA4",
+    "searchedFields": {
+    "name": "Mark Account 01",
+    "postalCode": "10583",
+    "phone": "9149243398"
+    },
+    "candidates": [
+    {
+    "internalId": "12345",
+    "entityId": "Acme Corp",
+    "isInactive": false,
+    "confidence": 0.92,
+    "matchReasons": [
+    { "field": "name", "score": 0.94, "detail": "Fuzzy match: 'Acme' ≈ 'Acme'" },
+    { "field": "postalCode", "score": 1.0, "detail": "Exact match" }
+    ],
+    "address": {
+    "line1": "123 Main Street",
+    "city": "Boston",
+    "state": "MA",
+    "postalCode": "12345",
+    "country": "US"
+    },
+    "phone": "999-999-9999"
+    },
+    {
+    "internalId": "98765",
+    "entityId": "ACME Corporation - East",
+    "isInactive": false,
+    "confidence": 0.81,
+    "matchReasons": [
+    { "field": "name", "score": 0.84 },
+    { "field": "postalCode", "score": 1.0 }
+    ],
+    "address": {
+    "line1": "100 Industrial Road",
+    "city": "Boston",
+    "state": "MA",
+    "postalCode": "12345",
+    "country": "US"
+    },
+    "phone": "888-888-8888"
+    }
+    ]
+    }

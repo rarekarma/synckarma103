@@ -1,0 +1,136 @@
+<template>
+    <lightning-card title="NetSuite Customer Match" icon-name="standard:record">
+        <div class="slds-m-around_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading"></lightning-spinner>
+            </template>
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-m-bottom_medium">
+                    {error}
+                </div>
+            </template>
+            <template if:true={matchRecord}>
+                <!-- Status Display -->
+                <div class="slds-m-bottom_medium">
+                    <div class="slds-text-heading_small slds-m-bottom_small">Status</div>
+                    <div class="slds-text-body_regular">{displayStatus}</div>
+                </div>
+
+                <!-- Searched Fields Display -->
+                <template if:true={hasSearchedFields}>
+                    <div class="slds-m-bottom_medium">
+                        <div class="slds-text-heading_small slds-m-bottom_small">Searched Fields</div>
+                        <div class="slds-box slds-theme_default">
+                            <dl class="slds-list_horizontal slds-wrap">
+                                <template for:each={searchedFieldsList} for:item="field">
+                                    <dt key={field.key}
+                                        class="slds-item_label slds-text-color_weak slds-truncate"
+                                        title={field.key}>
+                                        {field.label}:
+                                    </dt>
+                                    <dd key={field.keyValue}
+                                        class="slds-item_detail slds-truncate"
+                                        title={field.value}>
+                                        {field.value}
+                                    </dd>
+                                </template>
+                            </dl>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Candidates Table -->
+                <template if:true={hasCandidates}>
+                    <div class="slds-m-bottom_medium">
+                        <div class="slds-text-heading_small slds-m-bottom_small">Candidates</div>
+                        <div class="slds-scrollable_x">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col" style="width: 3rem;">
+                                        <div class="slds-truncate" title="Select">Select</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Entity ID">Entity ID</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Confidence">Confidence</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Address">Address</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Phone">Phone</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={candidates} for:item="candidate">
+                                    <tr key={candidate.internalId} class={candidate.selectedClass}>
+                                        <td>
+                                            <lightning-input 
+                                                type="checkbox" 
+                                                checked={candidate.selected}
+                                                data-internal-id={candidate.internalId}
+                                                onchange={handleCandidateSelection}>
+                                            </lightning-input>
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate" title={candidate.entityId}>
+                                                {candidate.entityId}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate" title={candidate.confidencePercent}>
+                                                {candidate.confidencePercent}%
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate" title={candidate.addressFormatted}>
+                                                {candidate.addressFormatted}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate" title={candidate.phone}>
+                                                {candidate.phone}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Action Buttons -->
+                <div class="slds-m-top_medium slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <lightning-button 
+                            label="Use Selected" 
+                            variant="brand"
+                            onclick={handleUseSelected}
+                            disabled={isUseSelectedDisabled}>
+                        </lightning-button>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-button 
+                            label="Create New" 
+                            variant="brand"
+                            onclick={handleCreateNew}
+                            disabled={isSaving}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+            <template if:false={matchRecord}>
+                <template if:false={isLoading}>
+                    <div class="slds-text-align_center slds-m-vertical_medium">
+                        No NetSuite Customer Match found for this Account.
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>
+
