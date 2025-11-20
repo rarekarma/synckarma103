@@ -56,6 +56,9 @@ SF Commands
 -----------
 sf org open --target-org scratch-01
 sf package installed list --target-org scratch-01
+sf project deploy start --source-dir force-app/main/default/lwc/netsuiteCustomerMatch --source-dir force-app/main/default/classes --target-org scratch-02
+sf project retrieve start -o scratch-02
+
 
 To Fix
 ------

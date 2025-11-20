@@ -36,20 +36,40 @@ public with sharing class NetSuiteCustomerMatchController {
     @AuraEnabled
     public static void updateMatch(Id matchId, String decision, String selectedInternalId, String status) {
         try {
-            NetSuite_Customer_Match__c match = new NetSuite_Customer_Match__c(
-                Id = matchId,
-                Decision__c = decision,
-                Status__c = status
-            );
+            // First, query the match record to get the Account relationship
+            List<NetSuite_Customer_Match__c> matches = [
+                SELECT Id, Account__c
+                FROM NetSuite_Customer_Match__c
+                WHERE Id = :matchId
+                LIMIT 1
+            ];
+            
+            if (matches.isEmpty()) {
+                throw new AuraHandledException('Match record not found');
+            }
+            
+            NetSuite_Customer_Match__c match = matches[0];
+            
+            // Update the match record
+            match.Decision__c = decision;
+            match.Status__c = status;
             
             if (selectedInternalId != null) {
                 match.Selected_NetSuite_Internal_ID__c = selectedInternalId;
             }
             
             update match;
+            
+            // If a candidate was selected, update the Account's NetSuite_Customer_ID__c field
+            if (selectedInternalId != null && match.Account__c != null) {
+                Account acc = new Account(
+                    Id = match.Account__c,
+                    NetSuite_Customer_ID__c = selectedInternalId
+                );
+                update acc;
+            }
         } catch (Exception e) {
             throw new AuraHandledException('Error updating match record: ' + e.getMessage());
         }
     }
 }
-

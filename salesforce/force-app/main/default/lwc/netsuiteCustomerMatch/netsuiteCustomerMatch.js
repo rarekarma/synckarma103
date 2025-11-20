@@ -235,4 +235,3 @@ export default class NetsuiteCustomerMatch extends LightningElement {
         this.dispatchEvent(evt);
     }
 }
-
