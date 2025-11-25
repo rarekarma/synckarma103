@@ -1,0 +1,26 @@
+services:
+  middleware-debug:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    container_name: middleware-debug
+    ports:
+      - "9229:9229"  # Node.js debugger port
+    environment:
+      - NODE_ENV=development
+      - NODE_OPTIONS=--inspect=0.0.0.0:9229
+    # Override the CMD to run with debugging enabled
+    command: node --inspect=0.0.0.0:9229 dist/index.js
+    volumes:
+      # Mount source for better debugging
+      - ./src:/app/src:ro
+      # Mount dist so debugger can find source maps locally
+      # Note: Build locally first (npm run build) to generate source maps
+      - ./dist:/app/dist:ro
+    # Keep container running and allow interactive mode
+    stdin_open: true
+    tty: true
+    # Add any environment variables from .env.middleware file if it exists
+    env_file:
+      - .env.middleware
+

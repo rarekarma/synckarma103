@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Docker Container",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/middleware",
+      "remoteRoot": "/app",
+      "protocol": "inspector",
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/middleware/dist/**/*.js"]
+    },
+    {
+      "name": "Launch Apex Replay Debugger",
+      "type": "apex-replay",
+      "request": "launch",
+      "logFile": "${command:AskForLogFileName}",
+      "stopOnEntry": true,
+      "trace": true
+    }
+  ]
+}
+

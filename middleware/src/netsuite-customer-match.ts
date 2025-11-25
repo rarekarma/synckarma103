@@ -3,6 +3,8 @@
  * Used to create and manage NetSuite customer match records in Salesforce
  */
 
+import { logger } from './logger';
+
 export type Decision = 'Use Existing' | 'Create New';
 
 export type Status =
@@ -148,6 +150,7 @@ export class NetSuiteCustomerMatch {
       ? `${this.namespace}NetSuite_Customer_Match__c`
       : 'NetSuite_Customer_Match__c';
     const apiUrl = `${instanceUrl}/services/data/v58.0/sobjects/${objectName}`;
+    logger.debug({ apiUrl }, 'Salesforce API URL');
 
     // Convert to Salesforce payload
     const payload = this.toSalesforcePayload();

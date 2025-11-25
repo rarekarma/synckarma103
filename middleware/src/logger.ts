@@ -13,17 +13,18 @@ function createLogger() {
       // Check if pino-pretty is available
       require.resolve('pino-pretty');
       console.log('Using pino-pretty for logging');
-      return pino({
-        level: process.env.LOG_LEVEL || 'info',
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'HH:MM:ss Z',
-            ignore: 'pid,hostname'
-          }
-        }
+      
+      // Use pino-pretty as a destination stream (not transport) for synchronous output
+      // This ensures logs appear immediately when debugging
+      const pinoPretty = require('pino-pretty')({
+        colorize: true,
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname'
       });
+      
+      return pino({
+        level: process.env.LOG_LEVEL || 'info'
+      }, pinoPretty);
     } catch (e) {
       // pino-pretty not available, fall back to JSON logger
       console.log('Using JSON logger');

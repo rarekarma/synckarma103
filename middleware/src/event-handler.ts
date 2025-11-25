@@ -162,35 +162,36 @@ export class EventHandler {
       const accountChangeEvent = new AccountChangeEvent(eventData);
       await this.processAccountChangeEvent(accountChangeEvent);
     } catch (error) {
-      logger.error({ error }, 'Failed to parse Account event data');
+      // Use pino's standard error serialization (err key automatically serializes Error objects)
+      // This includes message, stack, type, and other error properties
+      logger.error({ err: error }, 'Failed to parse Account event data');
     }
   }
 
   private async processAccountChangeEvent(accountChangeEvent: AccountChangeEvent): Promise<void> {
     const accountId = accountChangeEvent.payload.ChangeEventHeader?.recordIds[0];
-    if (!accountId) { // this should never happen because we're only processing account change events
-      logger.error('Account ID is missing from ChangeEventHeader');
-      return;
+    if (!accountId) {
+      throw new Error('Account ID is missing from ChangeEventHeader');
     }
     const changedFields: string[] = accountChangeEvent.payload.ChangeEventHeader?.changedFields ?? [];
     logger.info({ accountId, changedFields }, 'Account Change Event');
-    const netSuiteCustomerId = accountChangeEvent.payload.synckarma103__NetSuite_Customer_ID__c;
+    let account: Account;
+    if (accountChangeEvent.payload.ChangeEventHeader?.changeType === 'UPDATE') {
+      logger.debug({ accountId }, 'Account payload is an update, getting all account data');
+      account = await Account.getAccount(accountId);
+    } else {
+      // TODO: investigate if we need this because do we even have changed fields for CREATE events?
+      // For CREATE events, construct Account from the payload (excluding ChangeEventHeader)
+      account = new Account(accountChangeEvent.payload);
+    }
+    const netSuiteCustomerId = account.synckarma103__NetSuite_Customer_ID__c;
     const isNetSuiteCustomerIdNullOrBlank = !netSuiteCustomerId || netSuiteCustomerId.trim() === '';
     if (
       changedFields.includes('synckarma103__Requires_NetSuite_Customer_Mapping__c') &&
+      account.synckarma103__Requires_NetSuite_Customer_Mapping__c &&
       isNetSuiteCustomerIdNullOrBlank
     ) {
-      logger.info({ accountId }, 'Getting matches from NetSuite...');
-      let account: Account;
-      if (accountChangeEvent.payload.ChangeEventHeader?.changeType === 'UPDATE') {
-        logger.debug({ accountId }, 'Account payload is an update, getting all account data');
-        account = await Account.getAccount(accountId);
-      } else {
-        // TODO: investigate if we need this because do we even have changed fields for CREATE events?
-        // For CREATE events, construct Account from the payload (excluding ChangeEventHeader)
-        account = new Account(accountChangeEvent.payload);
-      }
-      
+      logger.info({ accountId }, 'Getting matches from NetSuite...');      
       logger.debug({ 
         accountId, 
         accountName: account.Name,
@@ -201,6 +202,7 @@ export class EventHandler {
       logger.debug({ accountId, matchesJSON: likelyMatchesJSON }, 'Likely NetSuite customer matches');
       const namespace = process.env.SF_NAMESPACE ?? '';
       const netSuiteCustomerMatch = new NetSuiteCustomerMatch(accountId, likelyMatchesJSON, namespace);
+      logger.debug({ netSuiteCustomerMatch: JSON.parse(JSON.stringify(netSuiteCustomerMatch.toSalesforcePayload())) }, 'NetSuite Customer Match payload');
       const netSuiteCustomerMatchId = await netSuiteCustomerMatch.createInSalesforce();
       logger.info({ accountId, netSuiteCustomerMatchId }, 'NetSuite Customer Match created');
     }

@@ -52,6 +52,25 @@ docker development
 docker build --build-arg BUILD_DEV_DEPS=true -t synckarma-worker:dev .
 docker run --env-file .env.middleware synckarma-worker:dev
 
+docker debugging
+----------------
+# First, build locally to generate source maps for the debugger
+cd middleware
+npm run build
+
+# Then build and run the debug container
+docker-compose -f docker-compose.debug.yml up --build
+
+# In Cursor/VS Code:
+# 1. Set breakpoints in your TypeScript source files (e.g., src/event-handler.ts)
+# 2. Go to Run and Debug (Cmd+Shift+D or F5)
+# 3. Select "Attach to Docker Container" from the dropdown
+# 4. Click the play button or press F5
+# 5. The debugger will attach and you can step through code, inspect variables, etc.
+
+# To stop the debug container:
+docker-compose -f docker-compose.debug.yml down
+
 SF Commands
 -----------
 sf org open --target-org scratch-01

@@ -2,6 +2,13 @@
 # More information: https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_exclude_source.htm
 #
 
+# Profile metadata
+**/*.profile-meta.xml
+
+# App menus
+**/appMenus/**
+
+# Package files
 package.xml
 
 # LWC configuration files

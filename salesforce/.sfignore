@@ -1,2 +1,15 @@
-**/B2B*.profile-meta.xml
-**/Admin.profile-meta.xml
+# Profile metadata
+**/*.profile-meta.xml
+
+# App menus
+**/appMenus/**
+
+# Package files
+package.xml
+
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# LWC Jest
+**/__tests__/**
