@@ -198,6 +198,7 @@ export class EventHandler {
         postalCode: account.BillingAddress?.PostalCode,
         phone: account.Phone
       }, 'Account details');
+      // TODO: fix this.  should not need to pass accountId here.
       const likelyMatchesJSON = await this.netSuite.getCustomerLikelyMatches(account, accountId);
       logger.debug({ accountId, matchesJSON: likelyMatchesJSON }, 'Likely NetSuite customer matches');
       const namespace = process.env.SF_NAMESPACE ?? '';
