@@ -1,0 +1,20 @@
+<restlet scriptid="customscript_test1_restlet">
+  <name>Test1 RESTlet</name>
+  <scriptfile>[/SuiteScripts/test1_restlet.js]</scriptfile>
+  <description>Test RESTlet - Returns status ok for GET, echoes context for POST</description>
+  <isinactive>F</isinactive>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifygroup></notifygroup>
+  <notifyowner>F</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_test1_restlet">
+      <status>RELEASED</status>
+      <title>Test1 RESTlet Deployment</title>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <allroles>T</allroles>
+    </scriptdeployment>
+  </scriptdeployments>
+</restlet>

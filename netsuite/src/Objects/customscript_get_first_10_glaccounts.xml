@@ -1,0 +1,20 @@
+<restlet scriptid="customscript_get_first_10_glaccounts">
+  <name>Get First 10 GL Accounts</name>
+  <scriptfile>[/SuiteScripts/get_first_10_glaccounts.js]</scriptfile>
+  <description>RESTlet that returns the first 10 GL account names in alphabetical order</description>
+  <isinactive>F</isinactive>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifygroup></notifygroup>
+  <notifyowner>F</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_get_first_10_glaccounts">
+      <status>RELEASED</status>
+      <title>Get First 10 GL Accounts Deployment</title>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <allroles>T</allroles>
+    </scriptdeployment>
+  </scriptdeployments>
+</restlet>
